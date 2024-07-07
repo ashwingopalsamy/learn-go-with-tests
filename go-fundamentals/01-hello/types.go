@@ -1,6 +1,11 @@
 package main
 
 const (
-	engPrefixHello = "Hello, "
-	engSuffixSymbol = "! 👋"
+	langFrench      = "French"
+	langSpanish     = "Spanish"
+	langEnglish     = "English"
+	spanPrefixHello = "Hola, "
+	frenPrefixHello = "Bonjour, "
+	engPrefixHello  = "Hello, "
+	suffixSymbol    = "! 👋"
 )
