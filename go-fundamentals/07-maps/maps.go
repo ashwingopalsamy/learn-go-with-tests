@@ -1,46 +1,57 @@
 package main
 
-import (
-	"fmt"
-	"unsafe"
+var (
+	ErrNotFound         = DictionaryErr("could not find the word you were looking for")
+	ErrWordAlreadyExist = DictionaryErr("cannot add a word that already exist")
+	ErrWordDoesNotExist = DictionaryErr("cannot update word because it does not exist")
 )
 
-const (
-	ErrValueNotFound = DictionaryErr("no value found for the given key")
-	ErrAlreadyExists = DictionaryErr("cannot add word because it already exists")
+type (
+	Dictionary    map[string]string
+	DictionaryErr string
 )
-
-type DictionaryErr string
 
 func (e DictionaryErr) Error() string {
 	return string(e)
 }
 
-type Dictionary map[string]string
-
-func (d Dictionary) Search(word string) (string, error) {
-	def, ok := d[word]
+func (d Dictionary) Search(key string) (string, error) {
+	value, ok := d[key]
 	if !ok {
-		return "", ErrValueNotFound
+		return "", ErrNotFound
 	}
-	return def, nil
+	return value, nil
 }
 
-func (d Dictionary) Add(k, v string) error {
-	_, err := d.Search(v)
+func (d Dictionary) Add(key, value string) error {
+	_, err := d.Search(key)
 	switch err {
-	case ErrValueNotFound:
-		d[k] = v
+	case ErrNotFound:
+		d[key] = value
 	case nil:
-		return ErrAlreadyExists
+		return ErrWordAlreadyExist
 	default:
 		return err
 	}
+
 	return nil
 }
 
-func main() {
-	var m map[int]int
-	var p uintptr
-	fmt.Println(unsafe.Sizeof(m), unsafe.Sizeof(p)) // 8 8 (linux/amd64/arm)
+func (d Dictionary) Update(word, definition string) error {
+	_, err := d.Search(word)
+
+	switch err {
+	case ErrNotFound:
+		return ErrWordDoesNotExist
+	case nil:
+		d[word] = definition
+	default:
+		return err
+	}
+
+	return nil
+}
+
+func (d Dictionary) Delete(key string) {
+	delete(d, key)
 }
